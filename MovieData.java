@@ -1,7 +1,7 @@
 import java.io.*;
 import java.net.*;
 import java.nio.charset.*;
-import org.json.simple.*;
+import org.json.*;
 
 public class MovieData {
 
@@ -9,17 +9,28 @@ public class MovieData {
 
 	}
 
-	private InputStream queryApi(String api, String movieName) {
-		String baseUrl;
+	private InputStream queryApi(String api, String name) {
+		String baseUrl, searchParamKey, apiKey;
 		switch(api) {
 			case "omdb":
 				baseUrl = "http://www.omdbapi.com/";
+				searchParamKey = "t=";
+				apiKey = "";
 				break;
-			case "rottenTomato":
-				baseUrl = "http://www.omdbapi.com/";
+			case "rotten":
+				baseUrl = "http://api.rottentomatoes.com/api/public/movies.json"; //API key application closed!
+				searchParamKey = "q=";
+				apiKey = "";
+				break;
+			case "spotify":
+				baseUrl = "https://api.spotify.com/v1/search";
+				searchParamKey = "type=album&q=album:";
+				apiKey = "";
 				break;
 			default:
 				baseUrl = "http://www.omdbapi.com/";
+				searchParamKey = "t";
+				apiKey = "";
 				break;
 		}
 
@@ -28,7 +39,7 @@ public class MovieData {
 		InputStream response;
 
 		try {
-			url = new URL(baseUrl + "?t=" + movieName);
+			url = new URL(baseUrl + "?apiKey=" + apiKey + "&" + searchParamKey + name);
 			connection = url.openConnection();
 			connection.setRequestProperty("Accept-Charset", StandardCharsets.UTF_8.name());
 			response = connection.getInputStream();
@@ -51,12 +62,18 @@ public class MovieData {
 			BufferedReader streamReader = new BufferedReader(isr);
 			StringBuilder responseStrBuilder = new StringBuilder();
 			String inputStr;
-			
+
 			while ((inputStr = streamReader.readLine()) != null) {
 	    		responseStrBuilder.append(inputStr);
-				//JSONObject jsonObject = new JSONObject(responseStrBuilder.toString());
+
+	   			//try {
+				// 	JSONObject jsonObject = new JSONObject(responseStrBuilder.toString());
+				// } catch(JSONException e) {
+				// 	e.printStackTrace();
+				// }
+
 				//System.out.println(jsonObject.getString("Year"));
-				System.out.println(responseStrBuilder.toString());
+				System.out.println(inputStr);
 			}
 		} catch(IOException e) {
 			e.printStackTrace();
